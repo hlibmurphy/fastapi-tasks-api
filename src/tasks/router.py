@@ -4,7 +4,7 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from src.core.database import get_session
 from src.tasks import service
-from src.tasks.schemas import TaskCreate, TaskRead
+from src.tasks.schemas import TaskCreate, TaskRead, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -19,3 +19,11 @@ def get_tasks(session: Session = Depends(get_session)) -> List[TaskRead]:
 @router.post("/", response_model=TaskRead)
 def create_task(task: TaskCreate, session: Session = Depends(get_session)) -> TaskRead:
     return service.create_new_task(task, session)
+
+@router.put("/{task_id}", response_model=TaskRead)
+def update_task(task_id: int, task_update: TaskUpdate, session: Session = Depends(get_session)) -> TaskRead:
+    return service.update_task(task_id, task_update, session)
+
+@router.delete("/{task_id}", status_code=204)
+def delete_task(task_id: int, session: Session = Depends(get_session)):
+    return service.delete_task(task_id, session)
